@@ -7,8 +7,8 @@ const pool = new Pool({
   host: process.env.DB_HOST || "localhost",
   user: process.env.DB_USER || "postgres",
   password: process.env.DB_PASSWORD || "password",
-  database: process.env.DB_NAME || "hotel_db",
-  port: process.env.DB_PORT || 5432,
+  database: process.env.DB_NAME || "wallet_db",
+  port: process.env.DB_PORT || 5435,
 });
 
 // Function to run database schema
@@ -17,7 +17,7 @@ async function runSchema() {
     console.log("Running database schema...");
 
     // Read schema file
-    const schemaPath = path.join(__dirname, "schema.sql");
+    const schemaPath = path.join(__dirname, "../database/schema.sql");
     const schema = fs.readFileSync(schemaPath, "utf8");
 
     // Execute schema

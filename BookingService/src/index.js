@@ -1,31 +1,31 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-const { runSchema, testConnection } = require("./config/db.js");
-const routes = require("./routes");
+const { runSchema, testConnection } = require("./config/db");
+const routes = require("./routes/booking.route");
+const {
+  startPaymentSubscriber,
+} = require("./events/subscribers/payment.subscriber");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3004;
 
 app.get("/", (req, res) => {
-  res.send("User Service is running");
+  res.send("Booking Service is running"); // fix: was "Wallet Service"
 });
 
-app.use("/api", routes);
+app.use("/api/bookings", routes);
 
 async function initializeDatabase() {
   try {
-    // Test connection
     const connected = await testConnection();
     if (!connected) {
       console.error("Failed to connect to database");
       process.exit(1);
     }
-
-    // Run schema
     await runSchema();
   } catch (err) {
     console.error("Database initialization failed:", err);
@@ -36,8 +36,9 @@ async function initializeDatabase() {
 async function startServer() {
   try {
     await initializeDatabase();
+    await startPaymentSubscriber();
     app.listen(PORT, () => {
-      console.log(`User Service is running on port ${PORT}`);
+      console.log(`Booking Service is running on port ${PORT}`);
     });
   } catch (error) {
     console.error("Failed to start server:", error);

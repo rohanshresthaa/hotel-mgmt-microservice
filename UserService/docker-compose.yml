@@ -1,8 +1,4 @@
-version: '3.8'
-
 services:
- 
-  # PostgreSQL for User Service
   user-db:
     image: postgres:15
     container_name: user-db
@@ -11,9 +7,23 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
     ports:
-      - "5434:5432"
+      - "5436:5432"   # 5433=hotel-db, 5435=wallet-db, 5436=user-db
     volumes:
       - user_db_data:/var/lib/postgresql/data
     networks:
       - user-network
- 
+
+  user-redis:
+    image: redis:7-alpine
+    container_name: user-redis
+    ports:
+      - "6381:6379"
+    networks:
+      - user-network
+
+volumes:
+  user_db_data:
+
+networks:
+  user-network:
+    driver: bridge

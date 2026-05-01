@@ -1,0 +1,10 @@
+module.exports = {
+  BOOKING_CREATED:
+    "BOOKING_CREATED",
+
+  PAYMENT_SUCCESS:
+    "PAYMENT_SUCCESS",
+
+  PAYMENT_FAILED:
+    "PAYMENT_FAILED",
+};

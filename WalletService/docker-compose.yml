@@ -1,0 +1,29 @@
+services:
+  wallet-db:
+    image: postgres:15
+    container_name: wallet-db
+    environment:
+      POSTGRES_DB: wallet_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5435:5432"   # use unique port, 5433 is taken by hotel-db
+    volumes:
+      - wallet_db_data:/var/lib/postgresql/data
+    networks:
+      - wallet-network
+
+  wallet-redis:
+    image: redis:7-alpine
+    container_name: wallet-redis
+    ports:
+      - "6380:6379"   # use unique port, 6379 is taken by hotel-redis
+    networks:
+      - wallet-network
+
+volumes:
+  wallet_db_data:
+
+networks:
+  wallet-network:
+    driver: bridge
