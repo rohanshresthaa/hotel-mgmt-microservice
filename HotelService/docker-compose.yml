@@ -1,0 +1,29 @@
+services:
+  hotel-db:
+    image: postgres:15
+    container_name: hotel-db
+    environment:
+      POSTGRES_DB: hotel_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    volumes:
+      - hotel_db_data:/var/lib/postgresql/data
+    networks:
+      - hotel-network
+
+  hotel-redis:
+    image: redis:7-alpine
+    container_name: hotel-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - hotel-network
+
+volumes:
+  hotel_db_data:
+
+networks:
+  hotel-network:
+    driver: bridge

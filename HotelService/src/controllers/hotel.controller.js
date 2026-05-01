@@ -40,13 +40,13 @@ const createRoom = async (req, res) => {
     res.status(500).json(ApiResponse.failure(error.message));
   }
 };
-
 const deleteHotel = async (req, res) => {
   try {
     await hotelService.deleteHotel(req.params.hotelId);
     res.json(ApiResponse.success("Hotel deleted successfully"));
   } catch (error) {
-    res.status(500).json(ApiResponse.failure(error.message));
+    const status = error.message.includes("not found") ? 404 : 500;
+    res.status(status).json(ApiResponse.failure(error.message));
   }
 };
 
@@ -55,10 +55,10 @@ const deleteRoom = async (req, res) => {
     await hotelService.deleteRoom(req.params.hotelId, req.params.roomId);
     res.json(ApiResponse.success("Room deleted successfully"));
   } catch (error) {
-    res.status(500).json(ApiResponse.failure(error.message));
+    const status = error.message.includes("not found") ? 404 : 500;
+    res.status(status).json(ApiResponse.failure(error.message));
   }
 };
-
 module.exports = {
   getHotels,
   getRooms,
