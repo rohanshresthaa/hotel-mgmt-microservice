@@ -45,4 +45,38 @@ const getBookingById = async (req, res) => {
   }
 };
 
-module.exports = { createBooking, getBookings, getBookingById };
+const deleteBooking = async (req, res) => {
+  try {
+    await bookingService.deleteBooking(req.params.bookingId);
+    return res
+      .status(200)
+      .json(ApiResponse.success("Booking deleted successfully"));
+  } catch (error) {
+    const status = error.message.includes("not found") ? 404 : 500;
+    return res.status(status).json(ApiResponse.failure(error.message));
+  }
+};
+
+const updateBookingStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!status) {
+      return res.status(400).json(ApiResponse.failure("Status is required"));
+    }
+    await bookingService.updateBookingStatus(req.params.bookingId, status);
+    return res
+      .status(200)
+      .json(ApiResponse.success("Booking status updated successfully"));
+  } catch (error) {
+    const status = error.message.includes("not found") ? 404 : 500;
+    return res.status(status).json(ApiResponse.failure(error.message));
+  }
+};
+
+module.exports = {
+  createBooking,
+  getBookings,
+  getBookingById,
+  deleteBooking,
+  updateBookingStatus,
+};

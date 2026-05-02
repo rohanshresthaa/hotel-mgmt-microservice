@@ -1,0 +1,77 @@
+# hotel_mgmt/docker-compose.yml  (ROOT level - run this once)
+services:
+  # Shared Redis for all pub/sub
+  shared-redis:
+    image: redis:7-alpine
+    container_name: shared-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - hotel-network
+
+  # All databases
+  hotel-db:
+    image: postgres:15
+    container_name: hotel-db
+    environment:
+      POSTGRES_DB: hotel_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    volumes:
+      - hotel_db_data:/var/lib/postgresql/data
+    networks:
+      - hotel-network
+
+  wallet-db:
+    image: postgres:15
+    container_name: wallet-db
+    environment:
+      POSTGRES_DB: wallet_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5435:5432"
+    volumes:
+      - wallet_db_data:/var/lib/postgresql/data
+    networks:
+      - hotel-network
+
+  user-db:
+    image: postgres:15
+    container_name: user-db
+    environment:
+      POSTGRES_DB: user_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5436:5432"
+    volumes:
+      - user_db_data:/var/lib/postgresql/data
+    networks:
+      - hotel-network
+
+  booking-db:
+    image: postgres:15
+    container_name: booking-db
+    environment:
+      POSTGRES_DB: booking_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5437:5432"
+    volumes:
+      - booking_db_data:/var/lib/postgresql/data
+    networks:
+      - hotel-network
+
+volumes:
+  hotel_db_data:
+  wallet_db_data:
+  user_db_data:
+  booking_db_data:
+
+networks:
+  hotel-network:
+    driver: bridge

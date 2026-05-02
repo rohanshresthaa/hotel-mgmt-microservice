@@ -45,4 +45,18 @@ const getBookingById = async (bookingId) => {
   return booking;
 };
 
-module.exports = { createBooking, getBookings, getBookingById };
+const deleteBooking = async (bookingId) => {
+  await bookingRepository.deleteBooking(bookingId);
+};
+
+const updateBookingStatus = async (bookingId, status) => {
+  await bookingRepository.updateBookingStatus(bookingId, status);
+};
+
+module.exports = {
+  createBooking,
+  getBookings,
+  getBookingById,
+  deleteBooking,
+  updateBookingStatus,
+};

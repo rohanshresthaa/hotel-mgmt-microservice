@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
     ports:
-      - "5437:5432"   # use unique port, 5433 is taken by hotel-db
+      - "5437:5432"
     volumes:
       - booking_db_data:/var/lib/postgresql/data
     networks:
@@ -17,7 +17,7 @@ services:
     image: redis:7-alpine
     container_name: booking-redis
     ports:
-      - "6380:6379"   # use unique port, 6379 is taken by hotel-redis
+      - "6382:6379"   # fix: 6380 taken by wallet-redis, 6381 by user-redis
     networks:
       - booking-network
 

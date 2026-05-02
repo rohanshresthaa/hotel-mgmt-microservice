@@ -8,7 +8,7 @@ const pool = new Pool({
   user: process.env.DB_USER || "postgres",
   password: process.env.DB_PASSWORD || "password",
   database: process.env.DB_NAME || "booking_db",
-  port: process.env.DB_PORT || 5435,
+  port: process.env.DB_PORT || 5437,
 });
 
 // Function to run database schema

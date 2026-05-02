@@ -39,10 +39,15 @@ const getBookingById = async (bookingId) => {
   return result.rows[0] || null;
 };
 
+const deleteBooking = async (bookingId) => {
+  await pool.query(`DELETE FROM bookings WHERE id = $1`, [bookingId]);
+};
+
 module.exports = {
   createBooking,
   getRoomBooking,
   updateBookingStatus,
   getBookingsByUserId,
   getBookingById,
+  deleteBooking,
 };
