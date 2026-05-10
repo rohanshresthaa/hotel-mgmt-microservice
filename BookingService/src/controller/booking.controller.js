@@ -4,20 +4,29 @@ const ApiResponse = require("../utils/api_response");
 const createBooking = async (req, res) => {
   try {
     const booking = await bookingService.createBooking({
-      userId: req.user.id, // fix: .id not .userId
+      userId: req.user.id, 
       ...req.body,
     });
-    return res
-      .status(201)
-      .json(ApiResponse.success("Booking initiated successfully", { booking }));
+    let message = "Booking initiated successfully";
+    let status = 201;
+
+    if (booking?.status === "CONFIRMED") {
+      message = "Booking confirmed successfully";
+    } else if (booking?.status === "FAILED") {
+      message = "Booking failed";
+      status = 402;
+    }
+
+    return res.status(status).json(ApiResponse.success(message, { booking }));
   } catch (error) {
-    const status = error.message.includes("already booked")
-      ? 409
-      : error.message.includes("required")
-        ? 400
-        : error.message.includes("greater than")
-          ? 400
-          : 500;
+    let status = 500;
+    if (error.message.includes("already booked")) {
+      status = 409;
+    } else if (error.message.includes("required")) {
+      status = 400;
+    } else if (error.message.includes("greater than")) {
+      status = 400;
+    }
     return res.status(status).json(ApiResponse.failure(error.message));
   }
 };

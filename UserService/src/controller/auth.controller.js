@@ -38,6 +38,9 @@ async function login(req, res) {
     if (err.code === "INVALID_CREDENTIALS") {
       return res.status(401).json(ApiResponse.failure("Invalid credentials"));
     }
+    if (err.code === "USER_NOT_FOUND") {
+      return res.status(404).json(ApiResponse.failure("User not found"));
+    }
     console.error("Error in login:", err);
     return res.status(500).json(ApiResponse.failure("Internal server error"));
   }

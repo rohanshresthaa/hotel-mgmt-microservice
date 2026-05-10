@@ -24,8 +24,8 @@ async function registerUser(email, password) {
 async function loginUser(email, password) {
   const user = await userRepository.getUserByEmail(email);
   if (!user) {
-    const error = new Error("Invalid credentials");
-    error.code = "INVALID_CREDENTIALS";
+    const error = new Error("User does not exist");
+    error.code = "USER_NOT_FOUND";
     throw error;
   }
   const valid = await bcrypt.compare(password, user.password_hash);

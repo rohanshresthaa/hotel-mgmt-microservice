@@ -1,6 +1,23 @@
 const bookingRepository = require("../repository/booking.repository");
 const bookingPublisher = require("../events/publishers/booking.publisher");
 
+const DEFAULT_STATUS_WAIT_MS = 3000;
+const STATUS_POLL_INTERVAL_MS = 250;
+
+const waitForFinalStatus = async (bookingId, maxWaitMs) => {
+  const deadline = Date.now() + maxWaitMs;
+
+  while (Date.now() < deadline) {
+    const latest = await bookingRepository.getBookingById(bookingId);
+    if (latest && latest.status !== "PENDING") {
+      return latest;
+    }
+    await new Promise((resolve) => setTimeout(resolve, STATUS_POLL_INTERVAL_MS));
+  }
+
+  return await bookingRepository.getBookingById(bookingId);
+};
+
 const createBooking = async ({ userId, hotelId, roomId, amount }) => {
   if (!hotelId || !roomId || !amount) {
     throw new Error("hotelId, roomId and amount are required");
@@ -15,6 +32,7 @@ const createBooking = async ({ userId, hotelId, roomId, amount }) => {
   if (existingBooking) {
     throw new Error("Room already booked");
   }
+  
 
   // create pending booking
   const booking = await bookingRepository.createBooking({
@@ -32,7 +50,13 @@ const createBooking = async ({ userId, hotelId, roomId, amount }) => {
     amount,
   });
 
-  return booking;
+  // wait briefly for payment status update so response reflects balance outcome
+  const updatedBooking = await waitForFinalStatus(
+    booking.id,
+    DEFAULT_STATUS_WAIT_MS,
+  );
+
+  return updatedBooking || booking;
 };
 
 const getBookings = async (userId) => {
