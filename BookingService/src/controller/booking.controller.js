@@ -1,6 +1,9 @@
 const bookingService = require("../services/booking.service");
 const ApiResponse = require("../utils/api_response");
 
+
+// Functions for user-facing routes
+// POST /api/bookings
 const createBooking = async (req, res) => {
   try {
     const booking = await bookingService.createBooking({
@@ -46,6 +49,7 @@ const createBooking = async (req, res) => {
   }
 };
 
+// GET /api/bookings - get all bookings for the logged-in user
 const getBookings = async (req, res) => {
   try {
     const bookings = await bookingService.getBookings(req.user.id);
@@ -57,6 +61,7 @@ const getBookings = async (req, res) => {
   }
 };
 
+// GET /api/bookings/:bookingId - get details of a specific booking
 const getBookingById = async (req, res) => {
   try {
     const booking = await bookingService.getBookingById(req.params.bookingId);
@@ -69,6 +74,7 @@ const getBookingById = async (req, res) => {
   }
 };
 
+// DELETE /api/bookings/:bookingId - delete a booking (e.g. for cancellations)
 const deleteBooking = async (req, res) => {
   try {
     await bookingService.deleteBooking(req.params.bookingId);
@@ -81,6 +87,7 @@ const deleteBooking = async (req, res) => {
   }
 };
 
+// PUT /api/bookings/:bookingId/status - internal route for hotel service to update booking status
 const updateBookingStatus = async (req, res) => {
   try {
     const { status } = req.body;

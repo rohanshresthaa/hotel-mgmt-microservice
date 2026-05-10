@@ -9,25 +9,22 @@ let HPM_VERSION = 2;
 try {
   const pkg = require("http-proxy-middleware/package.json");
   HPM_VERSION = Number.parseInt(pkg.version.split(".")[0], 10);
-} catch (_) {
-  
-}
+} catch (_) {}
 console.log(`[Gateway] http-proxy-middleware v${HPM_VERSION}`);
 
 // ─── App setup ───────────────────────────────────────────────────────────────
 const app = express();
 app.use(cors());
 
-// ⚠️  DO NOT add express.json() globally — it consumes the body stream before
-//     the proxy can forward it, breaking all POST/PUT downstream routes.
-//     It is applied only inside the compositionRouter below.
 
+// ─── Configurable constants ─────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
 const REQUEST_TIMEOUT_MS = Number.parseInt(
   process.env.REQUEST_TIMEOUT_MS || "8000",
   10,
 );
 
+// ─── Service URLs (with defaults) ─────────────────────────────────────────────
 const USER_SERVICE_URL =
   process.env.USER_SERVICE_URL || "http://localhost:3003";
 const HOTEL_SERVICE_URL =
@@ -286,10 +283,7 @@ compositionRouter.get("/hotels", async (req, res) => {
 // Mount all composition routes
 app.use("/api/compositions", compositionRouter);
 
-// ════════════════════════════════════════════════════════════════════════════
-//  PROXY ROUTES  (compatible with http-proxy-middleware v2 AND v3)
-// ════════════════════════════════════════════════════════════════════════════
-
+//Function to create a proxy middleware with consistent logging and error handling
 function makeProxy(target, pathRewrite) {
   const config = {
     target,

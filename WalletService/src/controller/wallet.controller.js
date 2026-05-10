@@ -1,6 +1,9 @@
 const walletService = require("../services/wallet.service");
 const ApiResponse = require("../utils/api_response");
 
+// Functions to load money, withdraw, get balance, and get transactions for the logged-in user
+
+// POST /api/wallet/load - load money into wallet
 const loadMoney = async (req, res) => {
   try {
     const { amount } = req.body;
@@ -13,11 +16,13 @@ const loadMoney = async (req, res) => {
       .json(ApiResponse.success("Money loaded successfully", result));
   } catch (error) {
     const status = error.message.includes("Invalid") ? 400 : 500;
-    
+
     return res.status(status).json(ApiResponse.failure(error.message));
   }
 };
 
+
+// POST /api/wallet/withdraw - withdraw money from wallet
 const withdraw = async (req, res) => {
   try {
     const { amount } = req.body;
@@ -40,6 +45,7 @@ const withdraw = async (req, res) => {
   }
 };
 
+// GET /api/wallet/balance - get current balance for logged-in user
 const getBalance = async (req, res) => {
   try {
     const result = await walletService.getBalance(req.user.id);
@@ -65,6 +71,8 @@ const getBalanceByUserId = async (req, res) => {
   }
 };
 
+
+// GET /api/wallet/transactions - get transaction history for logged-in user
 const getTransactions = async (req, res) => {
   try {
     const transactions = await walletService.getTransactions(req.user.id);

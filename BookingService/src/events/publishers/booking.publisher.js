@@ -1,6 +1,7 @@
 const redis = require("../../config/redis");
 const EVENTS = require("../event.constants");
 
+// Functions to publish events to Redis channels
 const publishBookingCreated = async (data) => {
   await redis.publish(EVENTS.BOOKING_CREATED, JSON.stringify(data));
 };

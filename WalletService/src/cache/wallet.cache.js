@@ -1,7 +1,9 @@
 const redis = require("../config/redis");
 
+// Cache TTL in seconds
 const CACHE_TTL = 60;
 
+// Cache functions for wallet balance and transactions
 const getBalanceCache = async (userId) => {
   try {
     const data = await redis.get(`wallet:${userId}`);
@@ -12,6 +14,7 @@ const getBalanceCache = async (userId) => {
   }
 };
 
+// Cache the balance with an expiration time
 const setBalanceCache = async (userId, balance) => {
   try {
     await redis.set(
@@ -25,6 +28,7 @@ const setBalanceCache = async (userId, balance) => {
   }
 };
 
+// Clear the cached balance (e.g. after a transaction)
 const clearBalanceCache = async (userId) => {
   try {
     await redis.del(`wallet:${userId}`);
@@ -33,6 +37,7 @@ const clearBalanceCache = async (userId) => {
   }
 };
 
+// Similar functions for transactions cache
 const getTransactionsCache = async (userId) => {
   try {
     const data = await redis.get(`transactions:${userId}`);
@@ -43,6 +48,7 @@ const getTransactionsCache = async (userId) => {
   }
 };
 
+// Cache the transactions with an expiration time
 const setTransactionsCache = async (userId, transactions) => {
   try {
     await redis.set(
@@ -56,6 +62,7 @@ const setTransactionsCache = async (userId, transactions) => {
   }
 };
 
+// Clear the cached transactions (e.g. after a new transaction is added)
 const clearTransactionsCache = async (userId) => {
   try {
     await redis.del(`transactions:${userId}`);
