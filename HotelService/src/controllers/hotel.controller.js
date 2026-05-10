@@ -22,9 +22,7 @@ const getRooms = async (req, res) => {
 const createHotel = async (req, res) => {
   try {
     const hotel = await hotelService.createHotel(req.body);
-    res
-      .status(201)
-      .json(ApiResponse.success("Hotel created successfully", { hotel }));
+    res.status(201).json(ApiResponse.success("Hotel created successfully", { hotel }));
   } catch (error) {
     res.status(500).json(ApiResponse.failure(error.message));
   }
@@ -33,13 +31,12 @@ const createHotel = async (req, res) => {
 const createRoom = async (req, res) => {
   try {
     const room = await hotelService.createRoom(req.body);
-    res
-      .status(201)
-      .json(ApiResponse.success("Room created successfully", { room }));
+    res.status(201).json(ApiResponse.success("Room created successfully", { room }));
   } catch (error) {
     res.status(500).json(ApiResponse.failure(error.message));
   }
 };
+
 const deleteHotel = async (req, res) => {
   try {
     await hotelService.deleteHotel(req.params.hotelId);
@@ -59,6 +56,27 @@ const deleteRoom = async (req, res) => {
     res.status(status).json(ApiResponse.failure(error.message));
   }
 };
+
+// Internal — called by booking service
+// Body: { isAvailable: true | false }
+const updateRoomAvailability = async (req, res) => {
+  try {
+    const { hotelId, roomId } = req.params; 
+
+    const { isAvailable } = req.body;
+
+    if (typeof isAvailable !== "boolean") {
+      return res.status(400).json(ApiResponse.failure("isAvailable (boolean) is required"));
+    }
+
+    await hotelService.updateRoomAvailability(hotelId, roomId, isAvailable);
+    return res.json(ApiResponse.success(`Room marked ${isAvailable ? "available" : "unavailable"}`));
+  } catch (error) {
+    const status = error.message.includes("not found") ? 404 : 500;
+    res.status(status).json(ApiResponse.failure(error.message));
+  }
+};
+
 module.exports = {
   getHotels,
   getRooms,
@@ -66,4 +84,5 @@ module.exports = {
   createRoom,
   deleteHotel,
   deleteRoom,
+  updateRoomAvailability,
 };

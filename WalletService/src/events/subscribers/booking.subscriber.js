@@ -2,7 +2,7 @@ const Redis = require("ioredis");
 
 const subscriber = new Redis({
   host: process.env.REDIS_HOST || "localhost",
-  port: process.env.REDIS_PORT || 6380,
+  port: process.env.REDIS_PORT || 6379, // was hardcoded 6380 — now reads from env
   retryStrategy: (times) => {
     if (times > 3) return null;
     return Math.min(times * 200, 1000);

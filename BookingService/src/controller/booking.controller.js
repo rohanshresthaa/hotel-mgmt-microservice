@@ -4,7 +4,7 @@ const ApiResponse = require("../utils/api_response");
 const createBooking = async (req, res) => {
   try {
     const booking = await bookingService.createBooking({
-      userId: req.user.id, 
+      userId: req.user.id,
       ...req.body,
     });
     let message = "Booking initiated successfully";
@@ -12,20 +12,35 @@ const createBooking = async (req, res) => {
 
     if (booking?.status === "CONFIRMED") {
       message = "Booking confirmed successfully";
+      return res.status(status).json(ApiResponse.success(message, { booking }));
     } else if (booking?.status === "FAILED") {
-      message = "Booking failed";
-      status = 402;
+      // Reached only in edge cases where balance was deducted between
+      // the pre-check and the actual wallet deduction (race condition).
+      const reason = booking.failure_reason ?? "Payment failed";
+      return res
+        .status(402)
+        .json(ApiResponse.failure(`Booking failed: ${reason}`));
     }
 
+    console.log("Booking created:", booking);
     return res.status(status).json(ApiResponse.success(message, { booking }));
   } catch (error) {
     let status = 500;
-    if (error.message.includes("already booked")) {
+    if (error.message.includes("Insufficient balance")) {
+      status = 402;
+    } else if (error.message.includes("already booked")) {
       status = 409;
     } else if (error.message.includes("required")) {
       status = 400;
     } else if (error.message.includes("greater than")) {
       status = 400;
+    } else if (
+      error.message.includes("unreachable") ||
+      error.message.includes("authorization failed") ||
+      error.message.includes("not found — ensure") ||
+      error.message.includes("Wallet service error")
+    ) {
+      status = 503;
     }
     return res.status(status).json(ApiResponse.failure(error.message));
   }
@@ -33,7 +48,7 @@ const createBooking = async (req, res) => {
 
 const getBookings = async (req, res) => {
   try {
-    const bookings = await bookingService.getBookings(req.user.id); // fix: .id
+    const bookings = await bookingService.getBookings(req.user.id);
     return res
       .status(200)
       .json(ApiResponse.success("Bookings fetched successfully", { bookings }));

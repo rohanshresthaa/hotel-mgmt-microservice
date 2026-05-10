@@ -2,7 +2,7 @@ const Redis = require("ioredis");
 
 const subscriber = new Redis({
   host: process.env.REDIS_HOST || "localhost",
-  port: process.env.REDIS_PORT || 6379,
+  port: process.env.REDIS_PORT || 6382,
   retryStrategy: (times) => {
     if (times > 3) return null;
     return Math.min(times * 200, 1000);
@@ -19,18 +19,19 @@ const startPaymentSubscriber = async () => {
   subscriber.on("message", async (channel, message) => {
     try {
       const data = JSON.parse(message);
+      const { bookingId, reason } = data;
 
       if (channel === EVENTS.PAYMENT_SUCCESS) {
-        await bookingRepository.updateBookingStatus(
-          data.bookingId,
-          "CONFIRMED",
+        await bookingRepository.updateBookingStatus(bookingId, "CONFIRMED");
+        console.log(`Booking ${bookingId} confirmed`);
+      } else if (channel === EVENTS.PAYMENT_FAILED) {
+        // Persist the failure reason so the controller can return it
+        await bookingRepository.updateBookingStatusWithReason(
+          bookingId,
+          "FAILED",
+          reason ?? "Payment failed",
         );
-        console.log(`Booking ${data.bookingId} confirmed`);
-      }
-
-      if (channel === EVENTS.PAYMENT_FAILED) {
-        await bookingRepository.updateBookingStatus(data.bookingId, "FAILED");
-        console.log(`Booking ${data.bookingId} failed: ${data.reason}`);
+        console.log(`Booking ${bookingId} failed: ${reason}`);
       }
     } catch (error) {
       console.error("Payment subscriber error:", error.message);

@@ -13,6 +13,7 @@ const loadMoney = async (req, res) => {
       .json(ApiResponse.success("Money loaded successfully", result));
   } catch (error) {
     const status = error.message.includes("Invalid") ? 400 : 500;
+    
     return res.status(status).json(ApiResponse.failure(error.message));
   }
 };
@@ -50,6 +51,20 @@ const getBalance = async (req, res) => {
   }
 };
 
+// Internal endpoint: called by other services (e.g. booking service) using a service secret.
+// userId comes from the URL param, not req.user.
+const getBalanceByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const result = await walletService.getBalance(userId);
+    return res
+      .status(200)
+      .json(ApiResponse.success("Balance fetched successfully", result));
+  } catch (error) {
+    return res.status(500).json(ApiResponse.failure(error.message));
+  }
+};
+
 const getTransactions = async (req, res) => {
   try {
     const transactions = await walletService.getTransactions(req.user.id);
@@ -63,4 +78,10 @@ const getTransactions = async (req, res) => {
   }
 };
 
-module.exports = { loadMoney, withdraw, getBalance, getTransactions };
+module.exports = {
+  loadMoney,
+  withdraw,
+  getBalance,
+  getBalanceByUserId,
+  getTransactions,
+};

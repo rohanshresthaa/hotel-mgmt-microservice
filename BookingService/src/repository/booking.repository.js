@@ -24,6 +24,18 @@ const updateBookingStatus = async (bookingId, status) => {
   ]);
 };
 
+// New: updates status and persists the failure reason
+const updateBookingStatusWithReason = async (
+  bookingId,
+  status,
+  failureReason,
+) => {
+  await pool.query(
+    `UPDATE bookings SET status = $1, failure_reason = $2 WHERE id = $3`,
+    [status, failureReason, bookingId],
+  );
+};
+
 const getBookingsByUserId = async (userId) => {
   const result = await pool.query(
     `SELECT * FROM bookings WHERE user_id = $1 ORDER BY created_at DESC`,
@@ -47,6 +59,7 @@ module.exports = {
   createBooking,
   getRoomBooking,
   updateBookingStatus,
+  updateBookingStatusWithReason,
   getBookingsByUserId,
   getBookingById,
   deleteBooking,
